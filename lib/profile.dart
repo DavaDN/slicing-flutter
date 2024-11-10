@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:slicing/main.dart';
+import 'package:slicing/home.dart';
 import 'data.dart';
 
 void main() {
@@ -49,7 +49,7 @@ class _ProductPageState extends State<ProductPage> {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const MyApp()),
+              MaterialPageRoute(builder: (context) => const Home()),
             );
           },
         ),

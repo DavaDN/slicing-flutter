@@ -13,7 +13,7 @@ import 'package:slicing/cart.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const Cart());
+    await tester.pumpWidget(const Cart(cartItems: [],));
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

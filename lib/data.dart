@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'dart:io';
 import 'package:slicing/profile.dart';
-import 'package:image/image.dart' as img;
 
 void main() {
   runApp(const Data());
@@ -17,29 +16,17 @@ class Data extends StatefulWidget {
 
 class _DataState extends State<Data> {
   final _formKey = GlobalKey<FormState>();
-  final ImagePicker _picker = ImagePicker();
-  File? _selectedImage;
+  File? _selectedFile;
 
   String? selectedDropdownItem;
   List<String> dropdownItems = ["Makanan", "Minuman"];
 
-  Future<void> _pickImage() async {
-    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    if (pickedFile != null) {
-      // Convert the image to PNG format
-      File originalFile = File(pickedFile.path);
-      final originalImageBytes = await originalFile.readAsBytes();
-      final decodedImage = img.decodeImage(originalImageBytes);
-      
-      if (decodedImage != null) {
-        final jpgImageBytes = img.encodePng(decodedImage);
-        final jpgFilePath = pickedFile.path.replaceAll(RegExp(r'\.(pngg|jpeg|bmp|gif)$'), '.jpg');
-        final jpgFile = await File(jpgFilePath).writeAsBytes(jpgImageBytes);
-
-        setState(() {
-          _selectedImage = jpgFile;
-        });
-      }
+  Future<void> _pickFile() async {
+    final result = await FilePicker.platform.pickFiles(); // Memungkinkan semua jenis file
+    if (result != null && result.files.isNotEmpty) {
+      setState(() {
+        _selectedFile = File(result.files.single.path!);
+      });
     }
   }
 
@@ -150,7 +137,7 @@ class _DataState extends State<Data> {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Gambar',
+                  'File',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -158,28 +145,30 @@ class _DataState extends State<Data> {
                 ),
                 const SizedBox(height: 8),
                 InkWell(
-                  onTap: _pickImage,
+                  onTap: _pickFile,
                   child: Container(
-                    height: 150,
-                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
+                      color: Colors.grey[200],
+ borderRadius: BorderRadius.circular(10),
                       border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: _selectedImage == null
-                        ? const Center(child: Text('Pilih Gambar'))
-                        : Image.file(
-                            _selectedImage!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Text(
-                                  'Format gambar tidak didukung',
-                                  style: TextStyle(color: Colors.red),
-                                ),
-                              );
-                            },
+                    child: Row(
+                      children: [
+                        const Icon(Icons.insert_drive_file, size: 30, color: Colors.grey),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            _selectedFile != null 
+                              ? _selectedFile!.path.split('/').last 
+                              : 'Pilih File',
+                            style: const TextStyle(fontSize: 16),
+                            overflow: TextOverflow.ellipsis,
                           ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      ],
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

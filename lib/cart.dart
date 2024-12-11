@@ -1,59 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:slicing/home.dart';
+import 'home.dart';
 
-void main() => runApp(const Cart());
+class Cart extends StatefulWidget {
+  final List<CartItem> cartItems;
 
-class Cart extends StatelessWidget {
-  const Cart({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: CartPage(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
-class CartPage extends StatefulWidget {
-  const CartPage({super.key});
+  const Cart({super.key, required this.cartItems});
 
   @override
-  State<CartPage> createState() => _CartPageState();
+  State<Cart> createState() => _CartState();
 }
 
-class _CartPageState extends State<CartPage> {
-  // Cart items with quantity and price
-  final List<CartItem> _cartItems = [
-    CartItem(name: 'Burger King Medium', price: 50000, quantity: 1, imagePath: 'assets/burger.jpg'),
-    CartItem(name: 'Teh Botol', price: 4000, quantity: 1, imagePath: 'assets/teh_botol.jpg'),
-    CartItem(name: 'Burger King Small', price: 35000, quantity: 1, imagePath: 'assets/burger.jpg'),
-  ];
-
-  int get _total {
-    int subtotal = _cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
-    int tax = (subtotal * 0.11).round(); // Calculate 11% PPN
-    return subtotal + tax;
-  }
+class _CartState extends State<Cart> {
 
   void _incrementQuantity(int index) {
     setState(() {
-      _cartItems[index].quantity++;
+      widget.cartItems[index].quantity++;
     });
   }
 
   void _decrementQuantity(int index) {
     setState(() {
-      if (_cartItems[index].quantity > 1) {
-        _cartItems[index].quantity--;
+      if (widget.cartItems[index].quantity > 1) {
+        widget.cartItems[index].quantity--;
       }
     });
   }
 
   void _deleteItem(int index) {
     setState(() {
-      _cartItems.removeAt(index);
+      widget.cartItems.removeAt(index);
     });
+  }
+
+  int get total {
+    int subtotal = widget.cartItems.fold(0, (sum, item) => sum + item.price * item.quantity);
+    int tax = (subtotal * 0.11).round(); // Calculate 11% PPN
+    return subtotal + tax;
   }
 
   @override
@@ -63,10 +45,7 @@ class _CartPageState extends State<CartPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const Home()),
-            );
+            Navigator.pop(context);
           },
         ),
         title: const Text('Cart'),
@@ -75,9 +54,9 @@ class _CartPageState extends State<CartPage> {
         children: [
           Expanded(
             child: ListView.builder(
-              itemCount: _cartItems.length,
+              itemCount: widget.cartItems.length,
               itemBuilder: (context, index) {
-                final item = _cartItems[index];
+                final item = widget.cartItems[index];
                 return _buildCartItem(
                   item.name,
                   item.price,
@@ -95,10 +74,10 @@ class _CartPageState extends State<CartPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildSummaryRow('PPN 11%', 'Rp ${(_total - (_total / 1.11).round()).toStringAsFixed(2)}'),
-                _buildSummaryRow('Total Belanja', 'Rp ${(_total / 1.11).round().toStringAsFixed(2)}'),
+                _buildSummaryRow('PPN 11%', 'Rp ${(total - (total / 1.11).round()).toStringAsFixed(2)}'),
+                _buildSummaryRow('Total Belanja', 'Rp ${(total / 1.11).round().toStringAsFixed(2)}'),
                 const SizedBox(height: 8),
-                _buildSummaryRow('Total Pembayaran', 'Rp $_total', bold: true),
+                _buildSummaryRow('Total Pembayaran', 'Rp $total'),
                 const SizedBox(height: 16),
                 SizedBox(
                   width: double.infinity,
@@ -146,12 +125,12 @@ class _CartPageState extends State<CartPage> {
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, {bool bold = false}) {
+  Widget _buildSummaryRow(String label, String value) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
-        Text(value, style: TextStyle(fontWeight: bold ? FontWeight.bold : FontWeight.normal)),
+        Text(label),
+        Text(value),
       ],
     );
   }

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'cart.dart';  
+import 'profile.dart';  
 
-import 'profile.dart';
-import 'cart.dart';
-
-void main() {
-  runApp(const Home());
-}
+void main() => runApp(const Home());
 
 class Home extends StatelessWidget {
   const Home({super.key});
+
   @override
   Widget build(BuildContext context) {
     return const MaterialApp(
@@ -18,8 +16,46 @@ class Home extends StatelessWidget {
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final List<CartItem> _cartItems = [];
+  int _currentIndex = 0;  // To track the current index for BottomNavigationBar
+
+  void addToCart(CartItem item) {
+    setState(() {
+      _cartItems.add(item);
+    });
+  }
+
+  // Method to handle navigation based on index
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+
+    if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Cart(cartItems: _cartItems),
+        ),
+      );
+    }
+    // Add additional navigation logic for other tabs if needed
+    if (index == 2) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const Pfl()), // Navigate to Profile page
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,11 +73,10 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      
       body: Column(
         children: [
           // Bagian kategori
-         const Padding(
+          const Padding(
             padding: EdgeInsets.all(8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -52,7 +87,6 @@ class HomePage extends StatelessWidget {
               ],
             ),
           ),
-          
           // Judul dan list makanan
           Expanded(
             child: Column(
@@ -65,49 +99,104 @@ class HomePage extends StatelessWidget {
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                 ),
-                // Bagian Grid
                 Expanded(
                   child: GridView.count(
-                  crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,  // Responsif
-                  crossAxisSpacing: 8.0,
-                  mainAxisSpacing: 8.0,
-                  childAspectRatio: 2 / 2.5, 
+                    crossAxisCount: MediaQuery.of(context).size.width > 600 ? 4 : 2,
+                    crossAxisSpacing: 8.0,
+                    mainAxisSpacing: 8.0,
+                    childAspectRatio: 2 / 2.5,
                     padding: const EdgeInsets.all(15.0),
-                    children: const [
+                    children: [
                       FoodItem(
                         imagePath: 'assets/burger.jpg',
                         name: 'Burger King large',
                         price: 'Rp. 50.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Burger King large',
+                            price: 50000,
+                            quantity: 1,
+                            imagePath: 'assets/burger.jpg',
+                          ),
+                        ),
                       ),
                       FoodItem(
                         imagePath: 'assets/burger.jpg',
                         name: 'Burger King medium',
-                        price: 'Rp. 50.000,00',
+                        price: 'Rp. 35.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Burger King medium',
+                            price: 35000,
+                            quantity: 1,
+                            imagePath: 'assets/burger.jpg',
+                          ),
+                        ),
                       ),
                       FoodItem(
                         imagePath: 'assets/burger.jpg',
                         name: 'Burger King small',
-                        price: 'Rp. 50.000,00',
+                        price: 'Rp. 22.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Burger King small',
+                            price: 22000,
+                            quantity: 1,
+                            imagePath: 'assets/burger.jpg',
+                          ),
+                        ),
                       ),
                       FoodItem(
                         imagePath: 'assets/teh_botol.jpg',
                         name: 'Teh Botol',
                         price: 'Rp. 4.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Teh Botol',
+                            price: 4000,
+                            quantity: 1,
+                            imagePath: 'assets/teh_botol.jpg',
+                          ),
+                        ),
                       ),
                       FoodItem(
                         imagePath: 'assets/cocacola.jpg',
                         name: 'Coca Cola large',
                         price: 'Rp. 8.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Coca Cola large',
+                            price: 8000,
+                            quantity: 1,
+                            imagePath: 'assets/cocacola.jpg',
+                          ),
+                        ),
                       ),
                       FoodItem(
                         imagePath: 'assets/cocacola.jpg',
                         name: 'Coca Cola medium',
                         price: 'Rp. 6.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Coca Cola medium',
+                            price: 6000,
+                            quantity: 1,
+                            imagePath: 'assets/cocacola.jpg',
+                          ),
+                        ),
                       ),
                       FoodItem(
                         imagePath: 'assets/cocacola.jpg',
                         name: 'Coca Cola small',
                         price: 'Rp. 4.000,00',
+                        onAdd: () => addToCart(
+                          CartItem(
+                            name: 'Coca Cola small',
+                            price: 4000,
+                            quantity: 1,
+                            imagePath: 'assets/cocacola.jpg',
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -117,9 +206,9 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-
-      // Bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex, // Set the current index
+        onTap: _onTabTapped, // Set the tap handler
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -134,21 +223,58 @@ class HomePage extends StatelessWidget {
             label: 'Orders',
           ),
         ],
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const Cart()));
-          }
-          if (index == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (context) => const Pfl()));
-          }
-        },
       ),
     );
   }
 }
 
-// Widget untuk kategori
+class FoodItem extends StatelessWidget {
+  final String imagePath;
+  final String name;
+  final String price;
+  final VoidCallback onAdd;
+
+  const FoodItem({
+    super.key,
+    required this.imagePath,
+    required this.name,
+    required this.price,
+    required this.onAdd,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Image.asset(imagePath, fit: BoxFit.cover),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(price),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                icon: const Icon(Icons.add, color: Colors.green),
+                onPressed: onAdd,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class CategoryItem extends StatelessWidget {
   final bool isSelected;
   final String iconPath;
@@ -168,44 +294,6 @@ class CategoryItem extends StatelessWidget {
           child: Image.asset(iconPath, width: 40, height: 40),
         ),
       ],
-    );
-  }
-}
-
-// Widget untuk item makanan
-class FoodItem extends StatelessWidget {
-  final String imagePath;
-  final String name;
-  final String price;
-
-  const FoodItem({super.key, required this.imagePath, required this.name, required this.price});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Image.asset(imagePath, fit: BoxFit.cover),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Text(price),
-          ),
-          const Padding(
-            padding: EdgeInsets.all(8.0),
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Icon(Icons.add, color: Colors.green),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
